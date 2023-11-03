@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+    
+    environment {
+        awsUrlA = 'ec2_public_key' // EC2 PublicKey
+        awsUrlB = 'ec2_public_key' // EC2 PublicKey
+    }
+ 
+    stages {
+        // EC2에 JDK 설치하기
+        stage('JDK Install'){
+            steps{
+                installJDK(awsUrlA)
+                installJDK(awsUrlB)
+            }
+        }
+        // EC2에 Tomcat 압축파일 배포하기
+        stage('Tomcat Deploy'){
+            steps{
+                tomcatDeploy(awsUrlA)
+                tomcatDeploy(awsUrlB)
+            }
+        }
+        // Tomcat 압축파일 해제 후 Tomcat 실행하기
+        stage('Tomcat Start'){
+            steps{
+                tomcatStart(awsUrlA)
+                tomcatStart(awsUrlB)
+            }
+        }
+    }
+}
+ 
+def installJDK(awsUrl){
+    sshagent(['EC2_SSH']) { //SSH Agent가 원격접속을 위한 Credential 제공
+        sh """
+        ssh -o StrictHostKeyChecking=no ubuntu@${awsUrl} '
+        sudo apt update
+        sudo apt-get install -y openjdk-11-jdk
+        '
+        """
+    }      
+}
+ 
+def tomcatDeploy(awsUrl){
+    sshagent(['EC2_SSH']) {
+        sh "scp /root/apache-tomcat-9.0.82.tar.gz ubuntu@${awsUrl}:/home/ubuntu"
+    }        
+}
+ 
+def tomcatStart(awsUrl){
+    sshagent(['EC2_SSH']) {
+        sh """
+            ssh -o StrictHostKeyChecking=no ubuntu@${awsUrl} '
+            tar xvzf /home/ubuntu/apache-tomcat-9.0.82.tar.gz 
+            sh /home/ubuntu/apache-tomcat-9.0.82/bin/startup.sh
+            '
+        """
+    }
+}
