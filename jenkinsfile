@@ -2,8 +2,8 @@ pipeline {
     agent any
     
     environment {
-        awsUrlA = 'ec2_public_key' // EC2 PublicKey
-        awsUrlB = 'ec2_public_key' // EC2 PublicKey
+        awsUrlA = 'ec2_public_ip' // EC2 PublicIP
+        awsUrlB = 'ec2_public_ip' // EC2 PublicIP
     }
  
     stages {
