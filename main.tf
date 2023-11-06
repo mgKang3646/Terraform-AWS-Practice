@@ -9,8 +9,8 @@ terraform {
 
 provider "aws" {
  region = "ap-northeast-2" # Region 서울 
- access_key = "your_access_key" # IAM Access Key
- secret_key = "your_secret_key" # IAM Secret Key
+ access_key = "Your_Access_Key"
+ secret_key = "Your_Secret_Key"
 }
 
 resource "tls_private_key" "rsa_4096" {
@@ -35,35 +35,35 @@ resource "local_file" "private_key" {
 }
 
 #VPC 생성하기
-resource "aws_vpc" "demoVPC" {
+resource "aws_vpc" "goormVPC" {
   cidr_block = "10.10.0.0/16"
 }
  
 #서브넷 생성하기 ( 가용영역A )
-resource "aws_subnet" "demoSubnet_a" {
-  vpc_id     = aws_vpc.demoVPC.id
+resource "aws_subnet" "goormSubnet_a" {
+  vpc_id     = aws_vpc.goormVPC.id
   cidr_block = "10.10.1.0/24"
   availability_zone = "ap-northeast-2a"
  
   tags = {
-    Name = "demoSubnet_a"
+    Name = "goormSubnet_a"
   }
 }
  
 #서브넷 생성하기2 ( 가용영역B )
-resource "aws_subnet" "demoSubnet_b" {
-  vpc_id     = aws_vpc.demoVPC.id
+resource "aws_subnet" "goormSubnet_b" {
+  vpc_id     = aws_vpc.goormVPC.id
   cidr_block = "10.10.2.0/24"
   availability_zone = "ap-northeast-2c"
  
   tags = {
-    Name = "demoSubnet_b"
+    Name = "goormSubnet_b"
   }
 }
 
 #인터넷 게이트웨이 생성하기
 resource "aws_internet_gateway" "demo-igw" {
-  vpc_id = aws_vpc.demoVPC.id
+  vpc_id = aws_vpc.goormVPC.id
  
   tags = {
     Name = "main"
@@ -72,7 +72,7 @@ resource "aws_internet_gateway" "demo-igw" {
  
 #라우팅 테이블 생성하기
 resource "aws_route_table" "demo-rt" {
-  vpc_id = aws_vpc.demoVPC.id
+  vpc_id = aws_vpc.goormVPC.id
  
   route {
     cidr_block = "0.0.0.0/0" #인터넷 게이트웨이 
@@ -86,19 +86,19 @@ resource "aws_route_table" "demo-rt" {
  
 # 라우팅 테이블 어소시에이션 생성하기1
 resource "aws_route_table_association" "demo-rt-association_a" {
-  subnet_id      = aws_subnet.demoSubnet_a.id 
+  subnet_id      = aws_subnet.goormSubnet_a.id 
   route_table_id = aws_route_table.demo-rt.id
 }
  
 # 라우팅 테이블 어소시에이션 생성하기2
 resource "aws_route_table_association" "demo-rt-association_b" {
-  subnet_id      = aws_subnet.demoSubnet_b.id 
+  subnet_id      = aws_subnet.goormSubnet_b.id 
   route_table_id = aws_route_table.demo-rt.id
 }
 
-resource "aws_security_group" "demoVPC-sg" {
-  name        = "demoVPC-sg"
-  vpc_id      = aws_vpc.demoVPC.id
+resource "aws_security_group" "goormVPC-sg" {
+  name        = "goormVPC-sg"
+  vpc_id      = aws_vpc.goormVPC.id
 
   ingress {
     from_port        = 22
@@ -142,8 +142,8 @@ resource "aws_lb" "demo-alb" {
   name               = "demo-alb"
   internal           = false # 외부 트래픽 접근 가능
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.demoVPC-sg.id]
-  subnets            = [aws_subnet.demoSubnet_a.id, aws_subnet.demoSubnet_b.id]
+  security_groups    = [aws_security_group.goormVPC-sg.id]
+  subnets            = [aws_subnet.goormSubnet_a.id, aws_subnet.goormSubnet_b.id]
 }
  
 # 로드밸런서 Listener 생성하기
@@ -164,7 +164,7 @@ resource "aws_lb_target_group" "my_tg" {
   target_type = "instance"
   port     = 8080
   protocol = "HTTP"
-  vpc_id   = aws_vpc.demoVPC.id
+  vpc_id   = aws_vpc.goormVPC.id
 }
 
 # 인스턴스 생성하기
@@ -177,7 +177,7 @@ resource "aws_launch_template" "my_launch_template" {
  
   network_interfaces {
     associate_public_ip_address = true # Public IP 생성
-    security_groups = [ aws_security_group.demoVPC-sg.id ] #보안그룹 설정
+    security_groups = [ aws_security_group.goormVPC-sg.id ] #보안그룹 설정
   }
 }
  
@@ -188,7 +188,7 @@ resource "aws_autoscaling_group" "my-asg" {
   min_size                  = 2
   desired_capacity          = 2
   target_group_arns = [aws_lb_target_group.my_tg.arn]
-  vpc_zone_identifier       = [ aws_subnet.demoSubnet_a.id, aws_subnet.demoSubnet_b.id ]
+  vpc_zone_identifier       = [ aws_subnet.goormSubnet_a.id, aws_subnet.goormSubnet_b.id ]
   
   launch_template {
     id      = aws_launch_template.my_launch_template.id
