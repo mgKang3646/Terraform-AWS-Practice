@@ -1,4 +1,3 @@
-# Goorm-Pratice3
 <div align="center">
 <h1>Terraform-AWS-Practice</h1>
 <br>
