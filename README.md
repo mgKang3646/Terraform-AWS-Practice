@@ -5,9 +5,13 @@
 </div>
 
 <br>
+<br>
+
 
 ![무제-페이지-6 drawio (3)](https://github.com/mgKang3646/Terraform_Apache/assets/80077569/4ab92ebf-3e18-4e19-8cbb-9fa9e92d1988)
 
+<br>
+<br>
 
 ## 상세설명 
 
