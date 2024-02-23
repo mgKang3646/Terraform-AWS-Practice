@@ -14,5 +14,6 @@
 <br>
 
 ## 상세설명 
+<br> 
 
 [![Tistory Dark Theme](https://tistory-readme-stats.vercel.app/api?name=lordofkangs&postId=579&description=Vue.js%20Electron%20Python%20%EC%8B%A4%ED%96%89%EA%B8%B0&color=dark)](https://lordofkangs.tistory.com/579)
